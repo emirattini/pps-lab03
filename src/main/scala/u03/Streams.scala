@@ -1,5 +1,7 @@
 package u03
 
+import scala.annotation.tailrec
+
 object Streams extends App:
 
   import Sequences.*
@@ -40,14 +42,21 @@ object Streams extends App:
     // Task 3
 
     def takeWhile[A](stream: Stream[A])(pred: A => Boolean): Stream[A] = stream match
-      case Cons(head, tail) if pred(head()) => cons(head(), takeWhile(tail())(pred))
+      case Cons(h, t) if pred(h()) => cons(h(), takeWhile(t())(pred))
       case _ => Empty()
-    
-    def interleave[A](stream1: Stream[A], stream2: Stream[A]): Stream[A] = (stream1, stream2) match
-      case (Cons(h1, t1), Cons(h2, t2)) => cons(h1(), cons(h2(), interleave(t1(), t2())))
-      case (Cons(h1, t1), _) => cons(h1(), interleave(t1(), empty()))
-      case (_, Cons(h2, t2)) => cons(h2(), interleave(empty(), t2()))
+
+    def fill[A](n: Int)(value: A): Stream[A] = n match
+      case n if n > 0 => cons(value, fill(n - 1)(value))
       case _ => empty()
+
+    def fibonacci(): Stream[Int] =
+      def iter(i1: Int, i2: Int): Stream[Int] =
+        cons(i1, iter(i2, i1 + i2))
+      iter(0, 1)
+
+    def interleave[A](stream1: Stream[A], stream2: Stream[A]): Stream[A] = stream1 match
+      case Cons(h, t) => cons(h(), interleave(stream2, t()))
+      case _ => stream2
   end Stream
 end Streams
 
