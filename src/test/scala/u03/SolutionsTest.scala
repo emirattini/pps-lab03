@@ -1,29 +1,18 @@
 package u03
 
-import Optionals.Optional.*
-import extensionmethods.Sequences.*
-import org.junit.*
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Test
 import u02.Modules.Person.{Student, Teacher}
+import u03.Optionals.Optional.{Empty, Just}
 
-class SequenceTest:
+class SolutionsTest {
   import u03.Sequences.*
   import Sequence.*
   import Solutions.*
 
+  //Task 1 ------------------------------------------------------------------------------------------------------------
+
   val sequence: Sequence[Int] = Cons(10, Cons(20, Cons(30, Nil())))
-
-  @Test def testSum() =
-    assertEquals(0, sum(Nil()))
-    assertEquals(60, sum(sequence))
-
-  @Test def testMap() =
-    assertEquals(Cons(11, Cons(21, Cons(31, Nil()))), map(sequence)(_ + 1))
-    assertEquals(Cons("10", Cons("20", Cons("30", Nil()))), map(sequence)(_ + ""))
-
-  @Test def testFilter() =
-    assertEquals(Cons(20, Cons(30, Nil())), filter(sequence)(_ >= 20))
-    assertEquals(Cons(10, Cons(30, Nil())), filter(sequence)(_ != 20))
 
   @Test def testSkip() =
     assertEquals(Cons(30, Nil()), skip(sequence)(2))
@@ -88,7 +77,10 @@ class SequenceTest:
     assertEquals(Nil(), evenEmpty)
     assertEquals(Nil(), oddEmpty)
 
+  //Task 2 ------------------------------------------------------------------------------------------------------------
+
   import u02.Modules.*
+
   @Test def testMapToCourses() =
     val student = Student("Mario", 1)
     val course = "pps"
@@ -109,4 +101,28 @@ class SequenceTest:
     val sum = 3 + 4 + 5
     assertEquals(sum, foldLeft(numbers)(0)(_ + _))
 
-end SequenceTest
+  //Task 3 ------------------------------------------------------------------------------------------------------------
+  import Streams.Stream.*
+
+  @Test def takeWhile(): Unit =
+    val str1 = Stream.iterate(0)(_ + 1) // {0,1,2,3,..}
+    val str2 = Stream.takeWhile(str1)(_ < 5) // {0,1,2,3,4}
+    assertEquals(Cons(0, Cons(1, Cons(2, Cons(3, Cons(4, Nil()))))), Stream.toList(str2))
+
+  @Test def testFill(): Unit =
+    val expected = Cons("a", Cons("a", Cons("a", Nil())))
+    val value = Stream.toList(Stream.fill(3)("a"))
+    assertEquals(expected, value)
+
+  @Test def testFibonacci(): Unit =
+    val expected = Cons(0, Cons(1, Cons(1, Cons(2, Cons(3, Nil())))))
+    val fibonacci: Stream[Int] = Stream.fibonacci()
+    val actual = Stream.toList(Stream.take(fibonacci)(5))
+    assertEquals(expected, actual)
+
+  @Test def testInterleave(): Unit =
+    val stream1 = cons(1, cons(3, cons(5, empty())))
+    val stream2 = cons(2, cons(4, cons(6, cons(8, cons(10, empty())))))
+    val expected = Cons(1, Cons(2, Cons(3, Cons(4, Cons(5, Cons(6, Cons(8, Cons(10, Nil()))))))))
+    assertEquals(expected, toList(interleave(stream1, stream2)))
+}
