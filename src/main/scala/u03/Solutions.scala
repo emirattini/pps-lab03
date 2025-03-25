@@ -5,8 +5,6 @@ import u03.Sequences.Sequence.{Cons, Nil, filter, map}
 import u03.Optionals.Optional
 import u03.Optionals.Optional.Just
 import u03.Optionals.Optional.Empty
-import u03.Streams.Stream
-import u03.Streams.Stream.{Cons, Empty, cons}
 
 import java.util.function.BiFunction
 import scala.annotation.tailrec
@@ -23,6 +21,8 @@ object Solutions:
   def zip[A, B](first: Sequence[A], second: Sequence[B]): Sequence[(A, B)] = (first, second) match
     case (Cons(h1, t1), Cons(h2, t2)) => Cons((h1, h2), zip(t1, t2))
     case _ => Nil()
+
+  def append[A](s: Sequence[A], value: A): Sequence[A] = concat(s, Cons(value, Nil()))
 
   def concat[A](s1: Sequence[A], s2: Sequence[A]): Sequence[A] = s1 match
     case Cons(h, t) => Cons(h, concat(t, s2))
@@ -115,10 +115,6 @@ object Solutions:
 
   //Task 3 ------------------------------------------------------------------------------------------------------------
 
-  import u03.Streams.Stream.Empty
-  import u03.Streams.Stream.cons
-  import u03.Streams.Stream.empty
-
   enum Stream[A]:
     private case Empty()
     private case Cons(head: () => A, tail: () => Stream[A])
@@ -166,6 +162,7 @@ object Solutions:
 
       iter(0, 1)
 
+    //Svolto con Giosuè Mainardi
     def interleave[A](stream1: Stream[A], stream2: Stream[A]): Stream[A] = stream1 match
       case Cons(h, t) => cons(h(), interleave(stream2, t()))
       case _ => stream2

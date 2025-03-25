@@ -1,7 +1,6 @@
 package u03
 
 import Optionals.Optional.*
-import extensionmethods.Sequences.*
 import org.junit.*
 import org.junit.Assert.*
 import u02.Modules.Person.{Student, Teacher}

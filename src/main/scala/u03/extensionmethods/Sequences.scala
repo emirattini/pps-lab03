@@ -14,7 +14,6 @@ object Sequences:
         case _ => 0
 
     extension [A](l: Sequence[A])
-
       def map[B](mapper: A => B): Sequence[B] = l match
         case Cons(h, t) => Cons(mapper(h), t.map(mapper))
         case Nil() => Nil()
@@ -23,8 +22,15 @@ object Sequences:
         case Cons(h, t) if pred(h) => Cons(h, t.filter(pred))
         case Cons(_, t) => t.filter(pred)
         case Nil() => Nil()
-      
-      
+        
+      def append(value: A): Sequence[A] = concat(Cons(value, Nil()))
+        
+      def concat(l2: Sequence[A]): Sequence[A] =
+        def helper(l1: Sequence[A], l2: Sequence[A]): Sequence[A] = l1 match
+          case Cons(h, t) => Cons(h, helper(t, l2))
+          case _ => l2
+        helper(l, l2)
+
     def of[A](n: Int, a: A): Sequence[A] =
       if n == 0 then Nil[A]() else Cons(a, of(n - 1, a))
   end Sequence

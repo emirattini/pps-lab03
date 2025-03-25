@@ -1,10 +1,12 @@
 package u03
 
+import u03.extensionmethods.Sequences.Sequence
+import Sequence.*
+import u03.Streams.Stream.{cycle, cycle2}
+
 import scala.annotation.tailrec
 
 object Streams extends App:
-
-  import Sequences.*
 
   enum Stream[A]:
     private case Empty()
@@ -57,6 +59,17 @@ object Streams extends App:
     def interleave[A](stream1: Stream[A], stream2: Stream[A]): Stream[A] = stream1 match
       case Cons(h, t) => cons(h(), interleave(stream2, t()))
       case _ => stream2
+
+    def cycle[A](seq: Sequence[A]): Stream[A] =
+      def iter(s: Sequence[A]): Stream[A] = s match
+        case Sequence.Cons(head, tail) => cons(head, iter(tail))
+        case Sequence.Nil() => iter(seq)
+      iter(seq)
+
+    def cycle2[A](s: Sequence[A]): Stream[A] = s match
+      case Sequence.Cons(h, t) => cons(h, cycle(t append h))
+      case Nil() => Empty()
+
   end Stream
 end Streams
 
@@ -71,3 +84,11 @@ end Streams
 
   lazy val corec: Stream[Int] = Stream.cons(1, corec) // {1,1,1,..}
   println(Stream.toList(Stream.take(corec)(10))) // [1,1,..,1]
+
+  val repeat = Cons("a", Cons("b", Cons("c", Nil())))
+  val innovativeStream = Stream.cycle(repeat)
+  val value = Stream.toList(Stream.take(innovativeStream)(5))
+  println(value)
+  val innovativeStream2 = Stream.cycle2(repeat)
+  val value2 = Stream.toList(Stream.take(innovativeStream2)(10))
+  println(value2)
