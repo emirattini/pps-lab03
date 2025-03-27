@@ -3,8 +3,7 @@ package u03
 import u03.Sequences.Sequence
 import u03.Sequences.Sequence.{Cons, Nil, filter, map}
 import u03.Optionals.Optional
-import u03.Optionals.Optional.Just
-import u03.Optionals.Optional.Empty
+import u03.Optionals.Optional.{Empty, Just, orElse}
 
 import java.util.function.BiFunction
 import scala.annotation.tailrec
@@ -43,12 +42,9 @@ object Solutions:
   def min(s: Sequence[Int]): Optional[Int] =
     @tailrec
     def iter(s: Sequence[Int], min: Optional[Int]): Optional[Int] = s match
-      case Cons(h, t) => min match
-        case Empty() => iter(t, Just(h))
-        case Just(x) if h < x => iter(t, Just(h))
-        case _ => iter(t, min)
+      case Cons(h, t) if h < orElse(min, Int.MaxValue) => iter(t, Just(h))
+      case Cons(_, t) => iter(t, min)
       case _ => min
-
     iter(s, Empty())
 
   def evenIndices[A](s: Sequence[A]): Sequence[A] = s match
