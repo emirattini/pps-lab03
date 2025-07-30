@@ -2,7 +2,7 @@ package u03
 
 import u03.extensionmethods.Sequences.Sequence
 import Sequence.*
-import u03.Streams.Stream.{cycle, cycle2}
+import u03.Streams.Stream.{cycle, cycle2, fillUnf}
 
 import scala.annotation.tailrec
 
@@ -70,6 +70,13 @@ object Streams extends App:
       case Sequence.Cons(h, t) => cons(h, cycle(t append h))
       case Nil() => Empty()
 
+    def unfold[A, B](seed: A)(stop: A => Boolean, f: A => B, next: A => A): Stream[B] =
+      if stop(seed) then empty()
+      else Cons(() => f(seed), () => unfold(next(seed))(stop, f, next))
+
+    def fillUnf[A](n: Int)(value: A): Stream[A] =
+      unfold(n)(_ == 0, _ => value, _ - 1)
+
   end Stream
 end Streams
 
@@ -92,3 +99,5 @@ end Streams
   val innovativeStream2 = Stream.cycle2(repeat)
   val value2 = Stream.toList(Stream.take(innovativeStream2)(10))
   println(value2)
+
+  println(Stream.toList(fillUnf(10)(3)))
